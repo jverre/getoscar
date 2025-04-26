@@ -1,0 +1,156 @@
+---
+description: This rule provides additional information about the databse schema and available data
+globs: 
+alwaysApply: false
+---
+# Database Schema Documentation
+
+[IMPORTANT: This documentation must be updated whenever database schema changes are made. All schema modifications should be reflected here to maintain accuracy.]
+
+## Tables Overview
+
+### auth.users (Managed by Supabase)
+- Referenced only, not managed by Drizzle
+- Contains core user authentication data
+- Referenced by profiles and team_members
+
+### profiles
+- Extends Supabase auth.users
+- 1:1 relationship with auth.users
+- Primary purpose: Store additional user information
+```sql
+{
+  id: uuid (PK, references auth.users),
+  createdAt: timestamp
+}
+```
+
+### teams
+- Represents collaborative groups
+- Many-to-many relationship with users through team_members
+```sql
+{
+  id: uuid (PK),
+  name: string,
+  createdAt: timestamp
+}
+```
+
+### team_members
+- Junction table for users-teams relationship
+- Enables many-to-many relationship
+```sql
+{
+  id: uuid (PK),
+  teamId: uuid (FK -> teams),
+  userId: uuid (FK -> auth.users),
+  createdAt: timestamp
+}
+```
+
+### conversations
+- Always belongs to a team
+- Contains multiple messages
+```sql
+{
+  id: uuid (PK),
+  teamId: uuid (FK -> teams),
+  title: string,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+```
+
+### messages
+- Part of a conversation
+- Supports streaming responses
+- Follows Vercel AI SDK conventions
+```sql
+{
+  id: uuid (PK),
+  conversationId: uuid (FK -> conversations),
+  role: enum ('user' | 'assistant'),
+  content: text,
+  streaming: boolean,
+  complete: boolean,
+  createdAt: timestamp
+}
+```
+
+## Row Level Security (RLS) Policies
+
+### profiles
+- SELECT: Viewable by all authenticated users
+- UPDATE: Users can only update their own profile
+
+### teams
+- SELECT: Users can only view teams they belong to
+- INSERT: Any authenticated user can create teams
+
+### team_members
+- SELECT: Users can view members of their teams
+- INSERT: Users can join teams (user_id must match auth.uid)
+
+### conversations
+- SELECT: Users can view conversations in their teams
+- INSERT: Users can create conversations in their teams
+
+### messages
+- SELECT: Users can view messages in their team conversations
+- INSERT: Users can create messages in their team conversations
+
+## Database Conventions
+
+### Primary Keys
+- All tables use UUIDs for primary keys
+- Generated using defaultRandom()
+- Consistent with Supabase auth.users
+
+### Timestamps
+- createdAt: Present on all tables
+- updatedAt: Only on conversations (tracks last activity)
+- All timestamps default to NOW()
+- All timestamps are NOT NULL
+
+### Foreign Keys
+- All foreign keys are NOT NULL
+- Named consistently: entityId (e.g., teamId, userId)
+- All have referential integrity constraints
+
+### Enums
+- message_role: ['user', 'assistant']
+- Extensible for future message types
+
+## Migration Management
+
+### Commands
+- db:generate - Generate new migrations
+- db:push - Push schema changes
+- db:studio - Open Drizzle Studio
+- db:migrate - Apply migrations
+
+### Migration Files Location
+- Migrations stored in src/db/migrations
+- SQL format for better version control
+- Include RLS policies
+
+
+### profiles
+- SELECT: Viewable by all authenticated users
+- UPDATE: Users can only update their own profile
+
+### teams
+- SELECT: Users can only view teams they belong to
+- INSERT: Any authenticated user can create teams
+
+### team_members
+- SELECT: Users can view members of their teams
+- INSERT: Users can join teams (user_id must match auth.uid)
+
+### conversations
+- SELECT: Users can view conversations in their teams
+- INSERT: Users can create conversations in their teams
+
+### messages
+- SELECT: Users can view messages in their team conversations
+- INSERT: Users can create messages in their team conversations
