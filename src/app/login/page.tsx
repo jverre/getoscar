@@ -30,6 +30,29 @@ export default function LoginPage() {
             }
         });
     }, [router]);
+    
+    const getURL = () => {
+        const origin = window.location.origin
+        // Make sure to include a trailing `/`
+        return origin.endsWith('/') ? origin : `${origin}/`
+    }
+
+    const handleGoogleLogin = async () => {
+        try {
+            setLoginError(null);
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options:
+                {
+                    // Ensure window is defined (runs client-side)
+                    redirectTo: getURL()
+                }
+            });
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error logging in with Google:', error);
+        }
+    };
 
     const handleGithubLogin = async () => {
         try {
@@ -38,8 +61,7 @@ export default function LoginPage() {
                 provider: 'github',
                 options:
                 {
-                    // Ensure window is defined (runs client-side)
-                    redirectTo: typeof window !== 'undefined' ? window.location.origin : ''
+                    redirectTo: getURL()
                 }
             });
             if (error) throw error;
@@ -86,23 +108,6 @@ export default function LoginPage() {
             if (!loginError) { // Avoid overwriting specific error message
                 setLoginError("An unexpected error occurred.");
             }
-        }
-    };
-
-    const handleGoogleLogin = async () => {
-        try {
-            setLoginError(null);
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options:
-                {
-                    // Ensure window is defined (runs client-side)
-                    redirectTo: typeof window !== 'undefined' ? window.location.origin : ''
-                }
-            });
-            if (error) throw error;
-        } catch (error) {
-            console.error('Error logging in with Google:', error);
         }
     };
 
