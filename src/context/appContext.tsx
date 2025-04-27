@@ -53,10 +53,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setUserError(null)
       
       // Get current session
-      const { data: { session }, error } = await supabase.auth.getSession()
+      const { data: { user }, error } = await supabase.auth.getUser()
       if (error) throw error
       
-      setUser(session?.user ?? null)
+      setUser(user ?? null)
     } catch (err) {
       setUserError(err instanceof Error ? err : new Error('Failed to fetch user'))
       setUser(null)

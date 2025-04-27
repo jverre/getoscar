@@ -6,12 +6,12 @@ export async function GET() {
 
     try {
         // Get the current user's session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) throw sessionError
-        if (!session) {
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        if (userError) throw userError
+        if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
-        console.log("session", session.user.id)
+        
         // Get all teams the user is a member of, including team details
         const { data: teams, error: teamsError } = await supabase
             .from('team_members')
@@ -22,7 +22,7 @@ export async function GET() {
           created_at
         )
       `)
-            .eq('user_id', session.user.id)
+            .eq('user_id', user.id)
 
         if (teamsError) throw teamsError
 
@@ -44,9 +44,9 @@ export async function POST(request: Request) {
 
     try {
         // Get the current user's session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) throw sessionError
-        if (!session) {
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        if (userError) throw userError
+        if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
             .insert([
                 {
                     team_id: team.id,
-                    user_id: session.user.id,
+                    user_id: user.id,
                     created_at: new Date().toISOString()
                 }
             ])

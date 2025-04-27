@@ -23,9 +23,8 @@ export default function LoginPage() {
 
     // Check session on mount
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            console.log(session);
-            if (session?.user) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) {
                 router.push("/");
             }
         });
@@ -90,7 +89,6 @@ export default function LoginPage() {
             });
 
             if (error) {
-                console.log(error.message)
                 if (error.message === "Invalid login credentials") {
                     setLoginError("Invalid email or password."); // Set user-friendly error
                 } else {
@@ -102,7 +100,6 @@ export default function LoginPage() {
                 // or the useEffect hook (if kept) might trigger a redirect.
                 // Optionally, force a page refresh or router push if middleware isn't catching it immediately
                 router.push('/'); // Or refresh: router.refresh(); window.location.reload();
-                console.log("Password login successful");
             }
         } catch {
             if (!loginError) { // Avoid overwriting specific error message

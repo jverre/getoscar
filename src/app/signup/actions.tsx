@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/server'
 // Helper function to create initial user data
 async function createUserData(userId: string) {
     try {
-        console.log("Creating user data for", userId)
         await db.transaction(async (tx) => {
             // Create user profile
             await tx.insert(users).values({
@@ -79,8 +78,7 @@ export async function signupWithPassword(formData: FormData) {
 // OAuth signup with Google
 export async function signupWithGoogle(redirectUrl: string) {
     const supabase = await createClient()
-    console.log("redirectUrl", redirectUrl)
-
+    
     try {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
@@ -151,11 +149,11 @@ export async function handleGoogleCallback() {
     const supabase = await createClient()
 
     // Get session to verify authentication
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user?.id) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) {
         return { error: 'No authenticated user found' }
     }
 
     // Create user data using existing handleAuthCallback
-    return handleAuthCallback(session.user.id)
+    return handleAuthCallback(user.id)
 }
