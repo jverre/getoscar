@@ -7,29 +7,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createBrowserClient } from "@supabase/ssr";
-import { useRouter } from "next/navigation"; // Changed from react-router-dom
-import Link from 'next/link'; // Added for internal navigation
-import { AlertCircle } from "lucide-react"; // Or your preferred icon library
+import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import { AlertCircle } from "lucide-react";
 import Image from "next/image";
-// Removed imports: import { login, signup } from './actions';
+
 const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function LoginPage({
-    className,
-    ...props // props now excludes searchParams
-}: React.ComponentProps<"div">) { // Use the new props type
-    const router = useRouter(); // Changed from useNavigate
-    const [loginError, setLoginError] = useState<string | null>(null); // State for login error message
+export default function LoginPage() {
+    const [className] = useState("");
+    const router = useRouter();
+    const [loginError, setLoginError] = useState<string | null>(null);
 
-    // Check session on mounta
+    // Check session on mount
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             console.log(session);
             if (session?.user) {
-                router.push("/"); // Changed from navigate("/")
+                router.push("/");
             }
         });
     }, [router]);
@@ -110,7 +108,7 @@ export default function LoginPage({
     };
 
     return (
-        <div className={cn("flex h-full flex-col items-center justify-center gap-6 p-4", className)} {...props}>
+        <div className={cn("flex h-full flex-col items-center justify-center gap-6 p-4", className)}>
             <Card className="w-full max-w-2xl overflow-hidden p-0"> {/* Added max-width */}
                 <CardContent className="grid p-0 md:grid-cols-2">
                     <div className="p-6 md:p-8">

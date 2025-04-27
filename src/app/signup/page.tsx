@@ -1,6 +1,5 @@
 'use client'
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,11 +9,9 @@ import { AlertCircle } from "lucide-react"
 import { signupWithPassword, signupWithGoogle, signupWithGithub } from "./actions"
 import Image from "next/image"
 
-export default function SignupForm({
-    className,
-    ...props
-}: React.ComponentProps<"div">) {
+export default function SignupPage() {
     const [error, setError] = useState<string | null>(null)
+    
     const getURL = () => {
         let url =
             process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
@@ -58,7 +55,7 @@ export default function SignupForm({
     return (
         <div className="flex min-h-[100svh] -mt-24 flex-col items-center justify-center p-6 md:p-10">
             <div className="w-full max-w-sm md:max-w-3xl">
-                <div className={cn("flex flex-col gap-6", className)} {...props}>
+                <div className="flex flex-col gap-6">
                     <Card className="overflow- p-0">
                         <CardContent className="grid p-0 md:grid-cols-2">
                             <div className="p-6 md:p-8">
