@@ -10,23 +10,17 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation"; // Changed from react-router-dom
 import Link from 'next/link'; // Added for internal navigation
 import { AlertCircle } from "lucide-react"; // Or your preferred icon library
-
+import Image from "next/image";
 // Removed imports: import { login, signup } from './actions';
 const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Define props type including searchParams
-interface LoginPageProps extends React.ComponentProps<"div"> {
-    searchParams?: { [key: string]: string | string[] | undefined };
-}
-
 export default function LoginPage({
     className,
-    searchParams, // Destructure searchParams here
     ...props // props now excludes searchParams
-}: LoginPageProps) { // Use the new props type
+}: React.ComponentProps<"div">) { // Use the new props type
     const router = useRouter(); // Changed from useNavigate
     const [loginError, setLoginError] = useState<string | null>(null); // State for login error message
 
@@ -91,7 +85,7 @@ export default function LoginPage({
                 router.push('/'); // Or refresh: router.refresh(); window.location.reload();
                 console.log("Password login successful");
             }
-        } catch (error) {
+        } catch {
             if (!loginError) { // Avoid overwriting specific error message
                 setLoginError("An unexpected error occurred.");
             }
@@ -199,7 +193,7 @@ export default function LoginPage({
                     </div>
                     {/* Kept placeholder image section */}
                     <div className="relative hidden bg-muted md:block">
-                        <img
+                        <Image
                             src="/placeholder.svg" // Assuming this path is valid in chat-app
                             alt="Image"
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"

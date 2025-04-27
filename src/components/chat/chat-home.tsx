@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Paperclip, ChevronDown, Send } from 'lucide-react';
+import { Paperclip, Send } from 'lucide-react';
 
 const models = [
     { id: 'gpt-4', name: 'GPT-4' },

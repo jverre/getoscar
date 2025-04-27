@@ -8,29 +8,25 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { AlertCircle } from "lucide-react"
 import { signupWithPassword, signupWithGoogle, signupWithGithub } from "./actions"
-
-interface SignupPageProps extends React.ComponentProps<"div"> {
-    searchParams?: { [key: string]: string | string[] | undefined };
-}
+import Image from "next/image"
 
 export default function SignupForm({
     className,
-    searchParams,
     ...props
-}: SignupPageProps) {
+}: React.ComponentProps<"div">) {
     const [error, setError] = useState<string | null>(null)
     const getURL = () => {
         let url =
-          process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
-          process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
-          'http://localhost:3000/'
+            process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+            process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+            'http://localhost:3000/'
         // Make sure to include `https://` when not localhost.
         url = url.startsWith('http') ? url : `https://${url}`
         // Make sure to include a trailing `/`.
         url = url.endsWith('/') ? url : `${url}/`
         return url
     }
-    
+
     const handleEmailSignup = async (formData: FormData) => {
         setError(null)
         const result = await signupWithPassword(formData)
@@ -131,7 +127,7 @@ export default function SignupForm({
                                 </div>
                             </div>
                             <div className="relative hidden bg-muted md:block">
-                                <img
+                                <Image
                                     src="/placeholder.svg"
                                     alt="Image"
                                     className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"

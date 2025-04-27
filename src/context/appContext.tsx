@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { type InferSelectModel } from 'drizzle-orm'
 import { teams } from '@/db/schema'
@@ -47,7 +47,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setIsLoadingUser(true)
       setUserError(null)
@@ -63,9 +63,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoadingUser(false)
     }
-  }
+  }, [supabase.auth])
 
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
     // Don't fetch teams if user is not authenticated
     if (!user) {
       setTeams([])
@@ -97,7 +97,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoadingTeams(false)
     }
-  }
+  }, [user, selectedTeamId])
 
   const createTeam = async (name: string): Promise<Team> => {
     if (!user) throw new Error('Must be authenticated to create a team')
@@ -128,9 +128,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Set up auth state listener and initial fetch
   useEffect(() => {
-    fetchUser() // Get initial session
+    fetchUser()
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
     })
@@ -138,12 +137,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [fetchUser, supabase.auth])
 
   // Fetch teams whenever user state changes
   useEffect(() => {
     fetchTeams()
-  }, [user])
+  }, [fetchTeams])
 
   // Set up real-time subscriptions for teams
   useEffect(() => {
@@ -178,7 +177,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       supabase.removeChannel(teamsChannel)
     }
-  }, [user])
+  }, [user, fetchTeams, supabase])
 
   return (
     <AppContext.Provider

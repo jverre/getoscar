@@ -36,8 +36,7 @@ export function NavHeader() {
         isLoadingTeams,
         teamsError,
         selectedTeamId,
-        setSelectedTeamId,
-        createTeam
+        setSelectedTeamId
     } = useApp()
 
     if (isLoadingTeams || isLoadingUser) {
