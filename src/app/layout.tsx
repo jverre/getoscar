@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider as UISidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { SidebarProvider as NavSidebarProvider } from "@/context/nav-context";
+import { AppProvider } from "@/context/appContext";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/layout/siteheader";
-import { UserProvider } from '@/context/user-context'
-import { AppProvider } from "@/context/appContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +21,6 @@ export const metadata: Metadata = {
   description: "Chat interface for OpenMCP", // Updated description
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,11 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-full bg-background text-foreground`} // Added flex, h-full, bg, text
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-full bg-background text-foreground`}
       >
         <AppProvider>
           <UISidebarProvider>
-            <UserProvider>
             <AppSidebar />
             <SidebarInset>
               <SiteHeader />
@@ -44,7 +40,6 @@ export default function RootLayout({
                 {children}
               </div>
             </SidebarInset>
-            </UserProvider>
           </UISidebarProvider>
         </AppProvider>
       </body>

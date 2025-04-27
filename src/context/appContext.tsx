@@ -4,9 +4,11 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { type InferSelectModel } from 'drizzle-orm'
 import { teams } from '@/db/schema'
+import { User as SupabaseUser } from '@supabase/supabase-js'
+
 
 export type Team = InferSelectModel<typeof teams>
-export type User = NonNullable<ReturnType<typeof useContext>['user']>
+export type User = SupabaseUser
 
 type AppContextType = {
   // User state

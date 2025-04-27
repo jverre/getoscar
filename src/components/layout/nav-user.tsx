@@ -31,14 +31,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Protected, PublicOnly } from '@/components/auth'
-import { useUser } from '@/context/user-context'
+import { PublicOnly } from '@/components/auth'
+import { useApp } from '@/context/appContext'
 
 const supabase = createClient();
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-  const { user } = useUser()
+  const { user } = useApp()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

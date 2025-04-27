@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { useUser } from '@/context/user-context'
+import { useApp } from '@/context/appContext'
 
 interface ProtectedProps {
   children: ReactNode
@@ -14,9 +14,9 @@ export function Protected({
   role,
   loadingComponent = <div>Loading...</div>
 }: ProtectedProps) {
-  const { user, isLoading } = useUser()
+  const { user, isLoadingUser } = useApp()
 
-  if (isLoading) {
+  if (isLoadingUser) {
     return <>{loadingComponent}</>
   }
 

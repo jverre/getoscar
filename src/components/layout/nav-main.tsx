@@ -1,27 +1,19 @@
-import { ChevronRight, type LucideIcon } from "lucide-react"
-
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+  Collapsible
 } from "@/components/ui/collapsible"
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
+  SidebarMenuItem
 } from "@/components/ui/sidebar"
-import { useUser } from '@/context/user-context'
+import { useApp } from '@/context/appContext'
 
 export function NavMain() {
-  const { user, isLoading } = useUser()
+  const { user, isLoadingUser } = useApp()
   
-  if (isLoading) {
+  if (isLoadingUser) {
     return <SidebarGroupLabel>Loading...</SidebarGroupLabel>
   }
 

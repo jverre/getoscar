@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { useUser } from '@/context/user-context'
+import { useApp } from '@/context/appContext'
 
 interface PublicOnlyProps {
   children: ReactNode
@@ -12,9 +12,9 @@ export function PublicOnly({
   fallback = null,
   loadingComponent = <div>Loading...</div>
 }: PublicOnlyProps) {
-  const { user, isLoading } = useUser()
+  const { user, isLoadingUser } = useApp()
 
-  if (isLoading) {
+  if (isLoadingUser) {
     return <>{loadingComponent}</>
   }
 
