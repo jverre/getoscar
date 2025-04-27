@@ -10,7 +10,6 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { AlertCircle } from "lucide-react";
-import Image from "next/image";
 
 const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -191,7 +190,7 @@ export default function LoginPage() {
                     </div>
                     {/* Kept placeholder image section */}
                     <div className="relative hidden bg-muted md:block">
-                        <Image
+                        <img
                             src="/placeholder.svg" // Assuming this path is valid in chat-app
                             alt="Image"
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"

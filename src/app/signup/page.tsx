@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { AlertCircle } from "lucide-react"
 import { signupWithPassword, signupWithGoogle, signupWithGithub } from "./actions"
-import Image from "next/image"
+
 
 export default function SignupPage() {
     const [error, setError] = useState<string | null>(null)
@@ -118,7 +118,7 @@ export default function SignupPage() {
                                 </div>
                             </div>
                             <div className="relative hidden bg-muted md:block">
-                                <Image
+                                <img
                                     src="/placeholder.svg"
                                     alt="Image"
                                     className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
