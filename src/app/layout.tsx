@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider as UISidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider as NavSidebarProvider } from "@/context/nav-context";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/layout/siteheader";
+import { UserProvider } from '@/context/user-context'
+import { AppProvider } from "@/context/appContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,15 +34,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-full bg-background text-foreground`} // Added flex, h-full, bg, text
       >
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-          <SiteHeader />
-            <div className="@container/main flex flex-1 flex-col gap-2">
+        <AppProvider>
+          <UISidebarProvider>
+            <UserProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <SiteHeader />
+              <div className="@container/main flex flex-1 flex-col gap-2">
                 {children}
-            </div>
-        </SidebarInset>
-      </SidebarProvider>
+              </div>
+            </SidebarInset>
+            </UserProvider>
+          </UISidebarProvider>
+        </AppProvider>
       </body>
     </html>
   );

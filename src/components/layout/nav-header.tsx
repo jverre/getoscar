@@ -4,14 +4,15 @@ import * as React from "react"
 import {
     ChevronsUpDown,
     Plus,
-    SquarePen
+    SquarePen,
+    LifeBuoy,
+    UserPen
 } from "lucide-react"
 import {
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    useSidebar
 } from "@/components/ui/sidebar"
 import {
     DropdownMenu,
@@ -23,21 +24,63 @@ import {
     DropdownMenuShortcut
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button"
+import { useSidebar as useUISidebar } from "@/components/ui/sidebar";
+import { useApp } from '@/context/appContext'
 
-export function NavHeader({ teams }: {
-    teams: {
-        name: string
-        logo: React.ElementType
-        plan: string
-    }[]
-}) {
-    const { isMobile } = useSidebar()
-    const [activeTeam, setActiveTeam] = React.useState(teams[0])
+export function NavHeader() {
+    const { isMobile } = useUISidebar()
+    const {
+        user,
+        isLoadingUser,
+        teams,
+        isLoadingTeams,
+        teamsError,
+        selectedTeamId,
+        setSelectedTeamId,
+        createTeam
+    } = useApp()
 
-    if (!activeTeam) {
-        return null
+    if (isLoadingTeams || isLoadingUser) {
+        return <SidebarHeader>Loading...</SidebarHeader>
     }
 
+    if (!user) {
+        return (
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <div className="flex items-center gap-2">
+                            <SidebarMenuButton
+                                size="lg"
+                                className="h-8 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus:outline-none focus-visible:ring-0"
+                            >
+                                <div className="flex aspect-square size-6 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
+                                    <UserPen className="size-4 shrink-0" />
+                                </div>
+                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                    <span className="truncate font-semibold">
+                                        Oscar
+                                    </span>
+                                </div>
+                            </SidebarMenuButton>
+                            <Button variant="ghost" size="icon">
+                                <SquarePen className="size-4" />
+                            </Button>
+                        </div>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
+        )
+    }
+
+    if (teamsError) {
+        console.error(teamsError)
+        return <SidebarHeader>Error loading teams</SidebarHeader>
+    }
+
+    if (!teams.length) {
+        return <SidebarHeader>No teams available</SidebarHeader>
+    }
 
     return (
         <SidebarHeader>
@@ -45,27 +88,25 @@ export function NavHeader({ teams }: {
                 <SidebarMenuItem>
                     <DropdownMenu>
                         <div className="flex items-center gap-2">
-                        <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton
-                                size="lg"
-                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                            >
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <activeTeam.logo className="size-4" />
-                                </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">
-                                        {activeTeam.name}
-                                    </span>
-                                    <span className="truncate text-xs">{activeTeam.plan}</span>
-                                </div>
-                                <ChevronsUpDown className="ml-auto" />
-                            </SidebarMenuButton>
-                        </DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon">
-                            <SquarePen className="size-4" />
-                        </Button>
-                        
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuButton
+                                    size="lg"
+                                    className="h-8 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus:outline-none focus-visible:ring-0"
+                                >
+                                    <div className="flex aspect-square size-6 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
+                                        <LifeBuoy className="size-4 shrink-0" />
+                                    </div>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-semibold">
+                                            {teams.find(team => team.id === selectedTeamId)?.name}
+                                        </span>
+                                    </div>
+                                    <ChevronsUpDown className="ml-auto" />
+                                </SidebarMenuButton>
+                            </DropdownMenuTrigger>
+                            <Button variant="ghost" size="icon">
+                                <SquarePen className="size-4" />
+                            </Button>
                         </div>
                         <DropdownMenuContent
                             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
@@ -79,11 +120,11 @@ export function NavHeader({ teams }: {
                             {teams.map((team, index) => (
                                 <DropdownMenuItem
                                     key={team.name}
-                                    onClick={() => setActiveTeam(team)}
+                                    onClick={() => setSelectedTeamId(team.id)}
                                     className="gap-2 p-2"
                                 >
                                     <div className="flex size-6 items-center justify-center rounded-sm border">
-                                        <team.logo className="size-4 shrink-0" />
+                                        <LifeBuoy className="size-4 shrink-0" />
                                     </div>
                                     {team.name}
                                     <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
@@ -100,7 +141,6 @@ export function NavHeader({ teams }: {
                     </DropdownMenu>
                 </SidebarMenuItem>
             </SidebarMenu>
-            
         </SidebarHeader>
     )
 }

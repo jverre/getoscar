@@ -16,20 +16,46 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useUser } from '@/context/user-context'
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
-}) {
+export function NavMain() {
+  const { user, isLoading } = useUser()
+  
+  if (isLoading) {
+    return <SidebarGroupLabel>Loading...</SidebarGroupLabel>
+  }
+
+  if (user === null) {
+    return (
+      <SidebarGroup>
+      <SidebarGroupLabel>Recent chats</SidebarGroupLabel>
+      <SidebarMenu>
+        <Collapsible>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Login to view your chats">
+                <a href="/login">
+                  <span>Login to view your chats</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Collapsible>
+      </SidebarMenu>
+    </SidebarGroup>
+    )
+  }
+
+  const items = [
+    {
+      title: "Bathing 2 week old baby",
+      url: "/",
+      isActive: true
+    },
+    {
+      title: "Run VS code Browser",
+      url: "/skills"
+    }
+  ]
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Recent chats</SidebarGroupLabel>
@@ -42,29 +68,6 @@ export function NavMain({
                   <span>{item.title}</span>
                 </a>
               </SidebarMenuButton>
-              {item.items?.length ? (
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className="data-[state=open]:rotate-90">
-                      <ChevronRight />
-                      <span className="sr-only">Toggle</span>
-                    </SidebarMenuAction>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </>
-              ) : null}
             </SidebarMenuItem>
           </Collapsible>
         ))}

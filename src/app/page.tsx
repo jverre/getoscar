@@ -10,7 +10,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 flex flex-1 items-center">
       <ChatInput onSubmit={handleChatSubmit} />
     </div>
   );

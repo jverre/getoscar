@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/utils/supabase/client";
+import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation"; // Changed from react-router-dom
 import Link from 'next/link'; // Added for internal navigation
 import { AlertCircle } from "lucide-react"; // Or your preferred icon library
 
 // Removed imports: import { login, signup } from './actions';
-const supabase = createClient();
+const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // Define props type including searchParams
 interface LoginPageProps extends React.ComponentProps<"div"> {

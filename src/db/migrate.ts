@@ -1,7 +1,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
-import { DATABASE_URL } from '@/lib/env';
+import { getDatabaseUrl } from '@/lib/env';
+
+const DATABASE_URL = getDatabaseUrl();
 
 // This will run migrations on the database, updating it to the latest version
 async function runMigrations() {
