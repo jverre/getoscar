@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation";
 import {
     ChevronsUpDown,
     Plus,
@@ -25,23 +26,29 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button"
 import { useSidebar as useUISidebar } from "@/components/ui/sidebar";
-import { useApp } from '@/context/appContext'
+import { useApp } from '@/context/appContext';
+import { getUserTeams } from "@/../convex/teams";
+import { useQuery } from "convex/react";
+import { api } from "@/../convex/_generated/api";
 
 export function NavHeader() {
+    const router = useRouter();
     const { isMobile } = useUISidebar()
     const {
-        user,
-        isLoadingUser,
-        teams,
-        isLoadingTeams,
-        teamsError,
         selectedTeamId,
         setSelectedTeamId
     } = useApp()
 
-    if (isLoadingTeams || isLoadingUser) {
-        return <SidebarHeader>Loading...</SidebarHeader>
-    }
+    const user = useQuery(api.users.viewer);
+    const teams = useQuery(api.teams.getUserTeams, { 
+        userId: user?._id 
+    }) ?? [];
+
+    const handleNewChat = async () => {
+        router.push(`/`);
+    };
+
+    const selectedTeam = teams.find(team => team._id === selectedTeamId);
 
     if (!user) {
         return (
@@ -62,7 +69,7 @@ export function NavHeader() {
                                     </span>
                                 </div>
                             </SidebarMenuButton>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" disabled title="Sign in to create a chat">
                                 <SquarePen className="size-4" />
                             </Button>
                         </div>
@@ -70,15 +77,6 @@ export function NavHeader() {
                 </SidebarMenu>
             </SidebarHeader>
         )
-    }
-
-    if (teamsError) {
-        console.error(teamsError)
-        return <SidebarHeader>Error loading teams</SidebarHeader>
-    }
-
-    if (!teams.length) {
-        return <SidebarHeader>No teams available</SidebarHeader>
     }
 
     return (
@@ -97,13 +95,13 @@ export function NavHeader() {
                                     </div>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">
-                                            {teams.find(team => team.id === selectedTeamId)?.name}
+                                            {selectedTeam?.name ?? 'Select Team'}
                                         </span>
                                     </div>
-                                    <ChevronsUpDown className="ml-auto" />
+                                    <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" onClick={handleNewChat}>
                                 <SquarePen className="size-4" />
                             </Button>
                         </div>
@@ -118,19 +116,18 @@ export function NavHeader() {
                             </DropdownMenuLabel>
                             {teams.map((team, index) => (
                                 <DropdownMenuItem
-                                    key={team.name}
-                                    onClick={() => setSelectedTeamId(team.id)}
+                                    key={team._id}
+                                    onClick={() => setSelectedTeamId(team._id)}
                                     className="gap-2 p-2"
                                 >
                                     <div className="flex size-6 items-center justify-center rounded-sm border">
                                         <LifeBuoy className="size-4 shrink-0" />
                                     </div>
                                     {team.name}
-                                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
                                 </DropdownMenuItem>
                             ))}
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="gap-2 p-2">
+                            <DropdownMenuItem className="gap-2 p-2" disabled>
                                 <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                                     <Plus className="size-4" />
                                 </div>

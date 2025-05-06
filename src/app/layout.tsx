@@ -5,6 +5,9 @@ import { SidebarProvider as UISidebarProvider, SidebarInset } from "@/components
 import { AppProvider } from "@/context/appContext";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/layout/siteheader";
+import { ChatStreamProvider } from '@/context/chatStreamContext';
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OpenMCP Chat", // Updated title
-  description: "Chat interface for OpenMCP", // Updated description
+  title: "Oscar", // Updated title
+  description: "Your personal assistant",
 };
 
 export default function RootLayout({
@@ -27,22 +30,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-full bg-background text-foreground`}
-      >
-        <AppProvider>
-          <UISidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <SiteHeader />
-              <div className="@container/main flex flex-1 flex-col gap-2">
-                {children}
-              </div>
-            </SidebarInset>
-          </UISidebarProvider>
-        </AppProvider>
-      </body>
-    </html>
+    <ConvexAuthNextjsServerProvider>
+      <html lang="en" className="h-full">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-full bg-background text-foreground`}
+        >
+          <ConvexClientProvider>
+            <ChatStreamProvider>
+              <AppProvider>
+                <UISidebarProvider>
+                  <AppSidebar />
+                  <SidebarInset>
+                    <SiteHeader />
+                    <div className="@container/main flex flex-1 flex-col gap-2 overflow-y-auto">
+                      {children}
+                    </div>
+                  </SidebarInset>
+                </UISidebarProvider>
+              </AppProvider>
+            </ChatStreamProvider>
+          </ConvexClientProvider>
+        </body>
+      </html>
+    </ConvexAuthNextjsServerProvider>
   );
 }

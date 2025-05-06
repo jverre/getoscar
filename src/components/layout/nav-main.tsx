@@ -1,6 +1,7 @@
-import {
-  Collapsible
-} from "@/components/ui/collapsible"
+"use client";
+
+import Link from 'next/link';
+import { TrashIcon } from 'lucide-react';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -9,61 +10,61 @@ import {
   SidebarMenuItem
 } from "@/components/ui/sidebar"
 import { useApp } from '@/context/appContext'
+import { Button } from "@/components/ui/button"
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/../convex/_generated/api";
+import { Id } from "@/../convex/_generated/dataModel";
+
+type NavItem = {
+  id: string;
+  title: string;
+  url: string;
+  isActive?: boolean;
+};
 
 export function NavMain() {
-  const { user, isLoadingUser } = useApp()
+  const { selectedTeamId } = useApp();
   
-  if (isLoadingUser) {
-    return <SidebarGroupLabel>Loading...</SidebarGroupLabel>
-  }
+  const conversations = useQuery(
+    api.conversations.getTeamConversations, 
+    selectedTeamId ? { teamId: selectedTeamId as Id<"teams"> } : "skip"
+  );
 
-  if (user === null) {
-    return (
-      <SidebarGroup>
-      <SidebarGroupLabel>Recent chats</SidebarGroupLabel>
-      <SidebarMenu>
-        <Collapsible>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Login to view your chats">
-                <a href="/login">
-                  <span>Login to view your chats</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </Collapsible>
-      </SidebarMenu>
-    </SidebarGroup>
-    )
-  }
+  const deleteConversation = useMutation(api.conversations.deleteConversation);
 
-  const items = [
-    {
-      title: "Bathing 2 week old baby",
-      url: "/",
-      isActive: true
-    },
-    {
-      title: "Run VS code Browser",
-      url: "/skills"
-    }
-  ]
+  const handleDeleteConversation = async (idToDelete: Id<"conversations">) => {
+    await deleteConversation({ conversationId: idToDelete });
+  };
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Recent chats</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
-                  <span>{item.title}</span>
-                </a>
+        {(conversations ?? []).map((item) => (
+          <SidebarMenuItem key={item._id}>
+            <div className="relative hover:[&>button]:opacity-100">
+              <SidebarMenuButton asChild tooltip={item.title} className="flex-grow pr-8">
+                <Link href={`c/${item._id}`} className="flex items-center justify-between w-full">
+                  <span className="truncate">{item.title}</span>
+                </Link>
               </SidebarMenuButton>
-            </SidebarMenuItem>
-          </Collapsible>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDeleteConversation(item._id);
+                }}
+                aria-label={`Delete chat ${item.title}`}
+              >
+                <TrashIcon className="h-4 w-4" />
+              </Button>
+            </div>
+          </SidebarMenuItem>
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

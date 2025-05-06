@@ -33,22 +33,26 @@ import {
 } from "@/components/ui/sidebar"
 import { PublicOnly } from '@/components/auth'
 import { useApp } from '@/context/appContext'
-
-const supabase = createClient();
+import { useAuthActions } from "@convex-dev/auth/react";
+import { api } from "@/../convex/_generated/api";
+import { useConvexAuth, useQuery } from "convex/react";
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-  const { user } = useApp()
 
+  const user = useQuery(api.users.viewer);
+  const { isAuthenticated } = useConvexAuth();
+
+  const { signOut } = useAuthActions();
+  
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await signOut();
     redirect('/')
   }
 
   return (
     <SidebarMenu>
-      <PublicOnly
-        fallback={
+      {isAuthenticated ? (
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -57,13 +61,13 @@ export function NavUser() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user?.user_metadata.avatar_url} alt={user?.user_metadata.full_name} />
+                    <AvatarImage src={user?.image} alt={user?.name} />
                     <AvatarFallback className="rounded-lg">
-                      {user?.user_metadata.full_name?.[0] ?? user?.email?.[0] ?? '?'}
+                      {user?.name ?? user?.email ?? user?.phone ?? "Anonymous"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user?.user_metadata.full_name ?? user?.email}</span>
+                    <span className="truncate font-semibold">{user?.name ?? user?.email}</span>
                     <span className="truncate text-xs">{user?.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
@@ -78,13 +82,13 @@ export function NavUser() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={user?.user_metadata.avatar_url} alt={user?.user_metadata.full_name} />
+                      <AvatarImage src={user?.image} alt={user?.name} />
                       <AvatarFallback className="rounded-lg">
-                        {user?.user_metadata.full_name?.[0] ?? user?.email?.[0] ?? '?'}
+                        {user?.name?.[0] ?? user?.email?.[0] ?? '?'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{user?.user_metadata.full_name ?? user?.email}</span>
+                      <span className="truncate font-semibold">{user?.name ?? user?.email}</span>
                       <span className="truncate text-xs">{user?.email}</span>
                     </div>
                   </div>
@@ -119,12 +123,11 @@ export function NavUser() {
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
-        }
-      >
+      ) : (
         <SidebarMenuItem>
           <SidebarMenuButton
             size="lg"
-            onClick={() => redirect('/login')}
+            onClick={() => redirect('/auth')}
           >
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarFallback className="rounded-lg">
@@ -136,7 +139,7 @@ export function NavUser() {
             </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
-      </PublicOnly>
+      )}
     </SidebarMenu>
   )
 }
