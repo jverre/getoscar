@@ -14,6 +14,7 @@ const team_members = defineTable({
 const conversations = defineTable({
   team_id: v.id("teams"),
   title: v.string(),
+  title_loading: v.boolean(),
   updated_at: v.number()
 });
 

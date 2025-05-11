@@ -46,8 +46,14 @@ export const sendMessage = mutation({
         if (!conversationId) {
             conversationId = await ctx.db.insert("conversations", {
                 title: "New Conversation",
+                title_loading: false,
                 updated_at: Date.now(),
                 team_id: teamId
+            });
+
+            await ctx.scheduler.runAfter(0, internal.conversations.createConversationTitle, {
+                conversationId: conversationId as Id<"conversations">,
+                first_user_message: content
             });
         }
 
@@ -103,8 +109,6 @@ export const generateResponse = internalAction({
             role: "assistant",
             conversationId: conversationId
         });
-        
-        console.log("messages", messages);
 
         let content = "";
         const { textStream } = streamText({

@@ -7,14 +7,14 @@ import { api } from '@/../convex/_generated/api';
 import { ChatMessages } from '@/components/chat/chatMessages';
 import { Id } from '@/../convex/_generated/dataModel';
 import { useAuthToken } from '@convex-dev/auth/react';
-import {redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function HomePage() {
   const { selectedTeamId } = useApp();
   const [messages, setMessages] = useState<any[]>([]);
-  
+
   const sendMessage = useMutation(api.messages.sendMessage);
 
   const submitData = async (messageText: string, selectedModel: string) => {
@@ -38,12 +38,20 @@ export default function HomePage() {
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto mb-4">
-        <ChatMessages messages={messages} />
+    <div className="flex flex-col h-full">
+      <div className="flex-grow overflow-y-auto p-4">
+        <div className="w-full max-w-3xl mx-auto space-y-4">
+          <ChatMessages messages={messages ?? []} />
+        </div>
       </div>
-      <div className="flex-shrink-0">
-        <ChatInput onSubmit={submitData} />
+
+      <div className="shrink-0 border-gray-200 p-4 bg-white">
+        <div className="w-full max-w-3xl mx-auto">
+          <ChatInput
+            onSubmit={submitData}
+            disabled={false}
+          />
+        </div>
       </div>
     </div>
   );

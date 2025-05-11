@@ -1,10 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
-import { type InferSelectModel } from 'drizzle-orm'
-import { teams, conversations as conversationsSchema } from '@/db/schema'
-import { User as SupabaseUser } from '@supabase/supabase-js'
+import { createContext, useContext, useState } from 'react'
 
 type AppContextType = {
   // User state
@@ -15,7 +11,6 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | null>(null)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // User state
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null)
 
   return (

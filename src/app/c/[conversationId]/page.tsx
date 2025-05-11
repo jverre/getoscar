@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect } from 'react'; // Import useEffect
-import { useParams, useRouter } from 'next/navigation';
-import { ChatConversation, ChatMessages } from '@/components/chat/chatMessages'; // Assuming component exists
+import { useParams } from 'next/navigation';
+import { ChatMessages } from '@/components/chat/chatMessages'; // Assuming component exists
 import { ChatInput } from '@/components/chat/chatInput'; // Assuming component exists
-import { useChatStream, Message } from '@/context/chatStreamContext'; // Import context hook and Message type
 import { useQuery } from 'convex/react';
 import { api } from '@/../convex/_generated/api';
 import { Id } from '@/../convex/_generated/dataModel';
@@ -38,11 +36,15 @@ export default function ChatPage() {
     <div className="flex flex-col h-full">
       <div className="flex-grow overflow-y-auto p-4">
           <div className="w-full max-w-3xl mx-auto space-y-4">
-          <ChatMessages messages={messages ?? []} />
+          <ChatMessages messages={messages?.map(message => ({
+            id: message._id,
+            content: message.content,
+            role: message.role
+          })) ?? []} />
           </div>
       </div>
 
-      <div className="shrink-0 border-t border-gray-200 p-4 bg-white">
+      <div className="shrink-0 border-gray-200 p-4 bg-white">
         <div className="w-full max-w-3xl mx-auto">
           <ChatInput
             onSubmit={submitData}

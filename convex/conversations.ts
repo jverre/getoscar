@@ -1,6 +1,13 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation, internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { generateText } from 'ai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { internal } from "./_generated/api";
+
+const openrouter = createOpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY!
+});
 
 export const getTeamConversations = query({
   args: { teamId: v.id("teams") },
@@ -68,4 +75,47 @@ export const deleteConversation = mutation({
     // If authorized, delete the conversation
     await ctx.db.delete(args.conversationId);
   },
+});
+
+export const updateConversationTitle = internalMutation({
+  args: {
+    conversationId: v.id("conversations"),
+    title: v.optional(v.string()),
+    title_loading: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const arg_to_update: any = {};
+    if (args.title) {
+      arg_to_update.title = args.title;
+    }
+    if (args.title_loading) {
+      arg_to_update.title_loading = args.title_loading;
+    }
+    await ctx.db.patch(args.conversationId, arg_to_update);
+  }
+});
+
+export const createConversationTitle = internalAction({
+  args: {
+    conversationId: v.id("conversations"),
+    first_user_message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.runMutation(internal.conversations.updateConversationTitle, {
+      conversationId: args.conversationId,
+      title_loading: true,
+    });
+
+    const { text } = await generateText({
+      model: openrouter('openai/gpt-4-turbo'),
+      system: 'You are a helpful assistant that generates short title for conversations based on the first user message. The title should be no more than 20 characters.',
+      prompt: args.first_user_message,
+    });
+
+    await ctx.runMutation(internal.conversations.updateConversationTitle, {
+      conversationId: args.conversationId,
+      title: text,
+      title_loading: false,
+    });
+  }
 });

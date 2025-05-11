@@ -1,9 +1,11 @@
 import React from 'react';
-import { ChatInput } from '@/components/chat/chatInput';
-import { useRouter } from 'next/navigation';
-import { Message, useChatStream } from '@/context/chatStreamContext';
 
-// Interface for component props
+interface Message {
+  id: string;
+  content: string;
+  role: string;
+}
+
 interface ChatMessagesProps {
   messages: Message[];
 }
@@ -71,21 +73,5 @@ export function ChatMessages({ messages }: ChatMessagesProps) {
         );
       })}
     </>
-  );
-}
-
-export function ChatConversation({ conversationId }: { conversationId: string }) {
-  const { getMessages, getStreamStatus } = useChatStream();
-  const messages = getMessages(conversationId);
-  const status = getStreamStatus(conversationId);
-
-  console.log(`ChatConversation status: ${status}`);
-  console.log(`ChatConversation messages: ${JSON.stringify(messages)}`);
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <ChatMessages messages={messages} />
-      </div>
-    </div>
   );
 }

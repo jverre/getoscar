@@ -5,7 +5,6 @@ import { SidebarProvider as UISidebarProvider, SidebarInset } from "@/components
 import { AppProvider } from "@/context/appContext";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/layout/siteheader";
-import { ChatStreamProvider } from '@/context/chatStreamContext';
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 
@@ -36,19 +35,17 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-full bg-background text-foreground`}
         >
           <ConvexClientProvider>
-            <ChatStreamProvider>
-              <AppProvider>
-                <UISidebarProvider>
-                  <AppSidebar />
-                  <SidebarInset>
-                    <SiteHeader />
-                    <div className="@container/main flex flex-1 flex-col gap-2 overflow-y-auto">
-                      {children}
-                    </div>
-                  </SidebarInset>
-                </UISidebarProvider>
-              </AppProvider>
-            </ChatStreamProvider>
+            <AppProvider>
+              <UISidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                  <SiteHeader />
+                  <div className="@container/main flex flex-1 flex-col gap-2 overflow-y-auto">
+                    {children}
+                  </div>
+                </SidebarInset>
+              </UISidebarProvider>
+            </AppProvider>
           </ConvexClientProvider>
         </body>
       </html>
