@@ -44,7 +44,7 @@ export function NavMain() {
           <SidebarMenuItem key={item._id}>
             <div className="relative hover:[&>button]:opacity-100">
               <SidebarMenuButton asChild tooltip={item.title} className="flex-grow pr-8">
-                <Link href={`c/${item._id}`} className="flex items-center justify-between w-full">
+                <Link href={`/c/${item._id}`} className="flex items-center justify-between w-full">
                   <span className="truncate">{item.title}</span>
                 </Link>
               </SidebarMenuButton>

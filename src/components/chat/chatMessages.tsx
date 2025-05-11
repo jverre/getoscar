@@ -46,7 +46,7 @@ export function ChatMessages({ messages }: ChatMessagesProps) {
     // The parent now provides space-y-4 for vertical spacing
     <>
       {messages.map((message) => {
-        const isUser = message.sender === 'user'; // Check if the message is from the user
+        const isUser = message.role === 'user'; // Check if the message is from the user
 
         return (
           // Each message container allows alignment using flex justify-*
@@ -64,7 +64,7 @@ export function ChatMessages({ messages }: ChatMessagesProps) {
             >
                {/* Render message content with basic code block handling */}
                <div className="prose prose-sm max-w-none break-words"> {/* prose class for potential markdown styling later */}
-                   {renderMessageContent(message.text)}
+                   {renderMessageContent(message.content)}
                </div>
             </div>
           </div>

@@ -7,9 +7,9 @@ import React, { createContext, useState, useContext, useCallback, ReactNode, use
 // Define message structure - adjust fields based on your actual API response
 export interface Message {
   id: string; // Unique identifier for each message
-  text: string;
-  sender: 'user' | 'ai' | string; // Or other relevant types
-  timestamp?: number; // Optional: timestamp
+  content: string;
+  role: 'user' | 'assistant' | string; // Or other relevant types
+  _creationTime?: number; // Optional: timestamp
   // Add any other relevant fields from your stream
 }
 
@@ -142,17 +142,24 @@ export const ChatStreamProvider = ({ children }: { children: ReactNode }) => {
           setStreams(prev => (prev[conversationId]?.status === 'reading' ? { ...prev, [conversationId]: { ...prev[conversationId]!, status: 'idle' }} : prev));
           break;
         }
-
+        console.log('reader', reader);
         const { done, value } = await reader.read();
-
+        console.log('done', done);
+        console.log('value', value);
         if (done) {
           console.log(`Stream finished for ${conversationId}.`);
           setStreams(prev => ({ ...prev, [conversationId]: { ...prev[conversationId]!, status: 'done' }}));
           break;
         }
 
-        // Decode the plain text chunk
+        // Decode the chunk and handle it
         const textChunk = decoder.decode(value, { stream: true });
+        
+        // Add error handling for empty chunks
+        if (!textChunk) {
+          console.warn('Received empty chunk from stream');
+          continue;
+        }
 
         if (textChunk) {
            // console.log(`[${conversationId}] Received chunk:`, textChunk); // Optional: Log chunks for debugging

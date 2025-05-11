@@ -30,6 +30,7 @@ import { useApp } from '@/context/appContext';
 import { getUserTeams } from "@/../convex/teams";
 import { useQuery } from "convex/react";
 import { api } from "@/../convex/_generated/api";
+import { useEffect } from "react"
 
 export function NavHeader() {
     const router = useRouter();
@@ -43,6 +44,13 @@ export function NavHeader() {
     const teams = useQuery(api.teams.getUserTeams, { 
         userId: user?._id 
     }) ?? [];
+
+    useEffect(() => {
+        const selectedTeam = teams.find(team => team._id === selectedTeamId);
+        if (!selectedTeam && teams.length > 0) {
+            setSelectedTeamId(teams[0]._id);
+        }
+    }, [teams, selectedTeamId, setSelectedTeamId]);
 
     const handleNewChat = async () => {
         router.push(`/`);
